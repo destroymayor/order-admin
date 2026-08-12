@@ -14,7 +14,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { shallow } from 'zustand/shallow'
 import { useOrderFilterStore } from '../stores/orderFilterStore'
 import { orderKeys } from '../api/orderQueries'
-import { fetchOrderFacets, fetchOrderRange, type Order } from '../api/orders'
+import { fetchOrderFacets, fetchOrderRange, type Order, type OrderDatasetId } from '../api/orders'
 import { ORDER_STATUS_LABEL } from '../constants/orderStatus'
 import { ORDER_PRIORITY_LABEL } from '../constants/orderPriority'
 import { dateOnlyComparator } from '../utils/agGridDateComparator'
@@ -27,7 +27,7 @@ import { createFacetFilterParams } from '../utils/orderFacetFilter'
  * 關鍵差異：datasource 不是 React 元件，不能用 hook。
  * 改成在 getRows 裡呼叫 queryClient.fetchQuery，一樣吃得到 TanStack Query 的快取與請求去重。
  */
-export function OrderGridSSRM() {
+export function OrderGridSSRM({ datasetId }: { datasetId: OrderDatasetId }) {
   const queryClient = useQueryClient()
   const gridApiRef = useRef<GridApi<Order> | null>(null)
   // facet 欄位（目前是 status，之後可能還有其他欄位）的 set filter 選項是非同步 API，
@@ -63,8 +63,9 @@ export function OrderGridSSRM() {
       // 選項不是寫死的陣列，而是打一支「facet API」問後端目前有哪些狀態值。
       // 之後若有其他欄位也要走 facet，一樣呼叫 createFacetFilterParams 帶自己的 fetcher 即可。
       filterParams: createFacetFilterParams({
+        datasetId,
         field: 'status',
-        fetchFacets: (filters, signal) => fetchOrderFacets('status', filters, signal),
+        fetchFacets: (filters, signal) => fetchOrderFacets(datasetId, 'status', filters, signal),
         queryClient,
         gridApiRef,
         syncedFieldsRef: facetSyncedFieldsRef,
@@ -78,8 +79,9 @@ export function OrderGridSSRM() {
       valueFormatter: (p) => (p.value ? ORDER_PRIORITY_LABEL[p.value as Order['priority']] : ''),
       filter: 'agSetColumnFilter',
       filterParams: createFacetFilterParams({
+        datasetId,
         field: 'priority',
-        fetchFacets: (filters, signal) => fetchOrderFacets('priority', filters, signal),
+        fetchFacets: (filters, signal) => fetchOrderFacets(datasetId, 'priority', filters, signal),
         queryClient,
         gridApiRef,
         syncedFieldsRef: facetSyncedFieldsRef,
@@ -104,7 +106,7 @@ export function OrderGridSSRM() {
       floatingFilter: true,
       filterParams: { filterOptions: ['inRange'], maxNumConditions: 1, comparator: dateOnlyComparator },
     },
-  ], [queryClient])
+  ], [queryClient, datasetId])
 
   const defaultColDef = useMemo<ColDef>(() => ({
     sortable: true,
@@ -122,13 +124,12 @@ export function OrderGridSSRM() {
       const { filters } = useOrderFilterStore.getState()
 
       const key = {
+        datasetId,
         startRow,
         endRow,
         sort: sortModel.map((s) => ({ colId: s.colId, sort: s.sort as 'asc' | 'desc' })),
         filters,
       }
-
-      console.log('getRows', key)
 
       try {
         const res = await queryClient.fetchQuery({
@@ -142,7 +143,7 @@ export function OrderGridSSRM() {
         params.fail()
       }
     },
-  }), [queryClient])
+  }), [queryClient, datasetId])
 
   const onGridReady = useCallback((e: GridReadyEvent<Order>) => {
     gridApiRef.current = e.api

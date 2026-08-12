@@ -4,7 +4,7 @@ import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'
 import { AllEnterpriseModule } from 'ag-grid-enterprise'
 import { FilterPresetCards } from './components/FilterPresetCards'
 import { OrderFilterBar } from './components/OrderFilterBar'
-import { OrderGridSSRM } from './components/OrderGridSSRM';
+import { OrderGridTabs } from './components/OrderGridTabs';
 
 import './styles.css'
 
@@ -27,7 +27,7 @@ export default function App() {
         <h1>訂單管理</h1>
         <FilterPresetCards />
         <OrderFilterBar />
-        <OrderGridSSRM />
+        <OrderGridTabs />
       </main>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

@@ -101,6 +101,37 @@ button:disabled {
   outline-offset: 2px;
 }
 
+.order-grid-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid #d0d7de;
+  margin-bottom: 12px;
+}
+
+.order-grid-tab {
+  border: none;
+  border-radius: 6px 6px 0 0;
+  background: transparent;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #57606a;
+  cursor: pointer;
+  position: relative;
+  top: 1px;
+}
+
+.order-grid-tab:hover {
+  color: #0969da;
+}
+
+.order-grid-tab-active {
+  color: #0969da;
+  font-weight: 600;
+  border: 1px solid #d0d7de;
+  border-bottom-color: #fff;
+  background: #fff;
+}
+
 .grid-meta {
   display: flex;
   gap: 12px;

@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
+import type { OrderDatasetId } from '../api/orders'
 
 export type SortItem = { colId: string; sort: 'asc' | 'desc' }
 
@@ -37,11 +38,15 @@ type OrderFilterState = {
   page: number
   pageSize: number
   sort: SortItem[]
+  // 目前作用中的 tab（對應 OrderGridSSRM 用的假資料集）：
+  // preset filter card 帶自己的 datasetId，點下去要能連動切換 tab，所以跟 filters 放在同一個 store 裡
+  activeDataset: OrderDatasetId
   setFilter: <K extends keyof OrderFilters>(key: K, value: OrderFilters[K]) => void
   setFilters: (patch: Partial<OrderFilters>) => void
   setSort: (sort: SortItem[]) => void
   setPage: (page: number) => void
   setPageSize: (pageSize: number) => void
+  setActiveDataset: (datasetId: OrderDatasetId) => void
   reset: () => void
 }
 
@@ -51,6 +56,7 @@ export const useOrderFilterStore = create<OrderFilterState>()(
     page: 0,
     pageSize: 50,
     sort: [],
+    activeDataset: 'A',
 
     setFilter: (key, value) =>
       set((s) => ({ filters: { ...s.filters, [key]: value }, page: 0 })),
@@ -62,6 +68,7 @@ export const useOrderFilterStore = create<OrderFilterState>()(
     setSort: (sort) => set({ sort, page: 0 }),
     setPage: (page) => set({ page }),
     setPageSize: (pageSize) => set({ pageSize, page: 0 }),
+    setActiveDataset: (activeDataset) => set({ activeDataset }),
     reset: () => set({ filters: initialFilters, sort: [], page: 0 }),
   })),
 )

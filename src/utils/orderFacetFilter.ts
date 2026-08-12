@@ -3,7 +3,7 @@ import type { GridApi, SetFilterValuesFuncParams } from 'ag-grid-community'
 import type { QueryClient } from '@tanstack/react-query'
 import { useOrderFilterStore, type OrderFilters } from '../stores/orderFilterStore'
 import { orderKeys } from '../api/orderQueries'
-import type { Order } from '../api/orders'
+import type { Order, OrderDatasetId } from '../api/orders'
 import { filtersToGridModel } from './orderGridFilterBridge'
 
 /**
@@ -15,6 +15,7 @@ import { filtersToGridModel } from './orderGridFilterBridge'
  * 完成時間不同，要各自追蹤「我的選項是不是第一次載入完成」，不能共用一個旗標。
  */
 export function createFacetFilterParams<K extends keyof Order>({
+  datasetId,
   field,
   fetchFacets,
   queryClient,
@@ -22,6 +23,7 @@ export function createFacetFilterParams<K extends keyof Order>({
   syncedFieldsRef,
   valueFormatter,
 }: {
+  datasetId: OrderDatasetId
   field: K
   fetchFacets: (filters: OrderFilters, signal?: AbortSignal) => Promise<Order[K][]>
   queryClient: QueryClient
@@ -34,7 +36,7 @@ export function createFacetFilterParams<K extends keyof Order>({
       const { filters } = useOrderFilterStore.getState()
       queryClient
         .fetchQuery({
-          queryKey: orderKeys.facets(field, filters),
+          queryKey: orderKeys.facets(datasetId, field, filters),
           queryFn: ({ signal }) => fetchFacets(filters, signal),
           staleTime: 30_000,
         })
