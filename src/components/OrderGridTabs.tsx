@@ -11,7 +11,7 @@ import { OrderGridSSRM } from './OrderGridSSRM'
  */
 export function OrderGridTabs() {
   const activeTab = useOrderFilterStore((s) => s.activeDataset)
-  const setActiveTab = useOrderFilterStore((s) => s.setActiveDataset)
+  const setActiveTab = useOrderFilterStore((s) => s.switchDataset)
 
   return (
     <div>

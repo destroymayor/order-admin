@@ -47,6 +47,7 @@ type OrderFilterState = {
   setPage: (page: number) => void
   setPageSize: (pageSize: number) => void
   setActiveDataset: (datasetId: OrderDatasetId) => void
+  switchDataset: (datasetId: OrderDatasetId) => void
   reset: () => void
 }
 
@@ -69,6 +70,8 @@ export const useOrderFilterStore = create<OrderFilterState>()(
     setPage: (page) => set({ page }),
     setPageSize: (pageSize) => set({ pageSize, page: 0 }),
     setActiveDataset: (activeDataset) => set({ activeDataset }),
+    // 手動切 tab（非套 preset）：不同 tab 是不同資料集，殘留的 filter 條件套到新資料集上沒有意義，所以一併清空
+    switchDataset: (activeDataset) => set({ activeDataset, filters: initialFilters, sort: [], page: 0 }),
     reset: () => set({ filters: initialFilters, sort: [], page: 0 }),
   })),
 )
